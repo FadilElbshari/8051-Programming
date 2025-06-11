@@ -6,7 +6,7 @@
 // 4. Perform a chip erase process, to allow for clean upload.
 // 5. Read in the hex file and store all bytes in their relative address locations.
 // - Pinout is given below in the pin definition section.
-// ------------------------------- By Fadil ELBSHARI ---------------------------------------
+// ------------------------------- By FADIL ELBSHARI ---------------------------------------
 
 
 // Constants definition
