@@ -127,7 +127,7 @@ void clock_gen() {
 
 // Instruction construction
 void construct_read_write_instruction(U16 address, U8 data, U8* result, bool write) { // Combines required data for an 8051 prog memory write instruction;
-  result[0] = write ? 0x40 : 0x40;
+  result[0] = write ? 0x40 : 0x20;
   result[1] = (address >> 8) & 0x1F;
   result[2] = address & 0xFF;
   result[3] = data;
@@ -228,6 +228,10 @@ void setup() {
   delay(DELAY);
 
   load_hexfile_to_8051(hex_file, lines);
+
+  // INSTRUCTION READ_ADDR;
+  // construct_read_write_instruction(0x0010, 0x00, READ_ADDR, false);
+  // send_instruction(READ_ADDR, sizeof(READ_ADDR), true);
 
   // Final step: RST -> LOW to allow normal operation
   digitalWrite(RST, LOW);
