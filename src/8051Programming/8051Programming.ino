@@ -1,6 +1,6 @@
 // ------------------------------- ISP based 8051 programmer -------------------------------
 // - Method explained below is made by reffering to the ATMEL "AT89S52" datasheet.
-// 1. This programmer uses a bintbang method.
+// 1. This programmer uses a bitbang method.
 // 2. Waits for a HEX file to be sent on the serial port.
 // 3. Initialses the 8051 to programming enable mode.
 // 4. Perform a chip erase process, to allow for clean upload.
@@ -8,6 +8,8 @@
 // - Pinout is given below in the pin definition section.
 // ------------------------------- By FADIL ELBSHARI ---------------------------------------
 
+// Code Functionality
+// #define WRITE
 
 // Constants definition
 #define INSTRUCT_SIZE_BITS 8
@@ -109,6 +111,7 @@ void send_instruction(const U8 *instructList, size_t size, bool read) {
       U8 response = send_and_read_byte(instructList[i]);
       Serial.print("Response: 0x");
       Serial.println(response, HEX);
+      Serial.println("");
     } else {
       Serial.print("Sending: ");
       Serial.println(instructList[i], HEX);
@@ -214,11 +217,12 @@ void setup() {
   digitalWrite(RST, HIGH);
   digitalWrite(SCK, LOW);
 
+
   // Step 2, send programming enable
   send_instruction(PROG_EN, sizeof(PROG_EN), true);
   delay(DELAY);
-  
 
+#ifdef WRITE
   while (!Serial.available()); // Wait until hex file is being sent on serial port
 
   delay(MAX_WAIT_TIME_FOR_FILE_MS); // Makes sure the whole file is read
@@ -229,9 +233,15 @@ void setup() {
 
   load_hexfile_to_8051(hex_file, lines);
 
-  // INSTRUCTION READ_ADDR;
-  // construct_read_write_instruction(0x0010, 0x00, READ_ADDR, false);
-  // send_instruction(READ_ADDR, sizeof(READ_ADDR), true);
+#else
+
+for (int i=0x0000; i<0x0005; i++) {
+  INSTRUCTION READ_ADDR;
+  construct_read_write_instruction(i, 0x00, READ_ADDR, false);
+  send_instruction(READ_ADDR, sizeof(READ_ADDR), true);
+}
+
+#endif
 
   // Final step: RST -> LOW to allow normal operation
   digitalWrite(RST, LOW);
